@@ -22,7 +22,9 @@ class Login extends React.Component {
     });
 
     fetch(
-      `https://archsystems.dev/wp-json/jwt/v1/auth/login?username=${username}&password=${password}`,
+      `${
+        process.env.RAZZLE_API_ENDPOINT
+      }wp-json/jwt/v1/auth/login?username=${username}&password=${password}`,
     )
       .then(response => response.json())
       .then(json => {

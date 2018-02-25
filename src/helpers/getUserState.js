@@ -10,7 +10,7 @@ export default (cookie, callback) => {
   }
 
   return Request({
-    uri: 'https://archsystems.dev/wp-json/wp/v2/users/me?xdebug=on',
+    uri: `${process.env.RAZZLE_API_ENDPOINT}wp-json/wp/v2/users/me`,
     rejectUnauthorized: false,
     headers: {
       Authorization: `Bearer ${cookie}`,

@@ -19,7 +19,9 @@ class Register extends React.Component {
     });
 
     fetch(
-      `https://archsystems.dev/wp-json/jwt/v1/auth/register?username=${username}&password=${password}&email=${email}`,
+      `${
+        process.env.RAZZLE_API_ENDPOINT
+      }wp-json/jwt/v1/auth/register?username=${username}&password=${password}&email=${email}`,
       {
         method: 'post',
       },
