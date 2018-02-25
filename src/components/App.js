@@ -10,20 +10,14 @@ import Login from './Login';
 import Register from './Register';
 import NoMatch from './NoMatch';
 import Protected from './Protected';
-import { isAuthenticated } from './authentication';
-import Cookies from 'js-cookie';
+import { isAuthenticated } from '../helpers/authentication';
+import { connect } from 'react-redux';
 
-const PrivateRoute = ({ component: Component, token, ...rest }) => (
+const PrivateRoute = ({ component: Component, user, ...rest }) => (
   <Route
     {...rest}
     render={(...props) => {
-      let authorized = '';
-      if (token) {
-        authorized = isAuthenticated(token);
-      } else {
-        authorized = isAuthenticated(Cookies.get('token'));
-      }
-
+      const authorized = isAuthenticated(user.jwt);
       if (authorized) {
         return <Component {...props} />;
       } else {
@@ -39,17 +33,20 @@ const PrivateRoute = ({ component: Component, token, ...rest }) => (
   />
 );
 
-const App = ({ token }, ...props) => (
+function mapStateToProps(state) {
+  return {
+    user: state.user,
+  };
+}
+
+const UserRoute = connect(mapStateToProps)(PrivateRoute);
+
+const App = (...props) => (
   <Switch>
     <Route exact={true} path="/" component={Home} />
     <Route path="/login" component={Login} />
     <Route path="/register" component={Register} />
-    <PrivateRoute
-      path="/create-team"
-      exact
-      component={Protected}
-      token={token}
-    />
+    <UserRoute path="/create-team" exact component={Protected} />
     <Route component={NoMatch} />
   </Switch>
 );

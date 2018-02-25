@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import logo from './react.svg';
+import logo from '../react.svg';
 
 class Container extends Component {
   render() {

@@ -1,33 +1,40 @@
-import App from './App';
-import Container from './Container';
 import React from 'react';
 import { StaticRouter } from 'react-router-dom';
 import express from 'express';
 import { renderToString } from 'react-dom/server';
 import cookieParser from 'cookie-parser';
+import { Provider } from 'react-redux';
+import serialize from 'serialize-javascript';
+import getUserState from './helpers/getUserState';
+
+import App from './components/App';
+import Container from './components/Container';
+import configureStore from './store/configureStore';
 
 const assets = require(process.env.RAZZLE_ASSETS_MANIFEST);
 
-const server = express();
-server
-  .disable('x-powered-by')
-  .use(express.static(process.env.RAZZLE_PUBLIC_DIR))
-  .use(cookieParser())
-  .get('/*', (req, res) => {
-    const context = {};
-    const markup = renderToString(
+const loadPage = (req, res, preloadedState) => {
+  const context = {};
+
+  const store = configureStore(preloadedState);
+
+  const markup = renderToString(
+    <Provider store={store}>
       <StaticRouter context={context} location={req.url}>
         <Container>
-          <App token={req.cookies.token} />
+          <App />
         </Container>
-      </StaticRouter>,
-    );
+      </StaticRouter>
+    </Provider>,
+  );
 
-    if (context.url) {
-      res.redirect(context.url);
-    } else {
-      res.status(200).send(
-        `<!doctype html>
+  const finalState = store.getState();
+
+  if (context.url) {
+    res.redirect(context.url);
+  } else {
+    res.status(200).send(
+      `<!doctype html>
     <html lang="">
     <head>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -47,10 +54,32 @@ server
     </head>
     <body>
         <div id="root">${markup}</div>
+        <script>
+          window.__PRELOADED_STATE__ = ${serialize(finalState)}
+        </script>
     </body>
 </html>`,
-      );
-    }
+    );
+  }
+};
+
+// const getUserData = cookie => {
+//   if (!cookie) {
+//     return {};
+//   }
+
+//   return;
+// };
+
+const server = express();
+server
+  .disable('x-powered-by')
+  .use(express.static(process.env.RAZZLE_PUBLIC_DIR))
+  .use(cookieParser())
+  .get('/*', (req, res) => {
+    getUserState(req.cookies.token, preloadedState => {
+      loadPage(req, res, preloadedState);
+    });
   });
 
 export default server;

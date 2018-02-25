@@ -1,15 +1,22 @@
-import App from './App';
+import App from './components/App';
 import BrowserRouter from 'react-router-dom/BrowserRouter';
 import React from 'react';
 import { hydrate } from 'react-dom';
-import Container from './Container';
+import { Provider } from 'react-redux';
+
+import Container from './components/Container';
+import configureStore from './store/configureStore';
+
+const store = configureStore(window.__PRELOADED_STATE__);
 
 hydrate(
-  <BrowserRouter>
-    <Container>
-      <App />
-    </Container>
-  </BrowserRouter>,
+  <Provider store={store}>
+    <BrowserRouter>
+      <Container>
+        <App />
+      </Container>
+    </BrowserRouter>
+  </Provider>,
   document.getElementById('root'),
 );
 

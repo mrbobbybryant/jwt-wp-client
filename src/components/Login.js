@@ -1,6 +1,9 @@
 import React from 'react';
 import { Message, Button, Input, Container, Header } from 'semantic-ui-react';
 import Cookies from 'js-cookie';
+// import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { set } from '../actions/user';
 
 class Login extends React.Component {
   state = {
@@ -11,6 +14,7 @@ class Login extends React.Component {
   };
 
   onSubmit = () => {
+    console.log(this.props);
     const { username, password } = this.state;
     this.setState({
       usernameError: '',
@@ -29,6 +33,7 @@ class Login extends React.Component {
 
         if (json.jwt) {
           Cookies.set('token', json.jwt);
+          this.props.set(json);
           this.props.history.push('/');
         }
       })
@@ -97,4 +102,8 @@ class Login extends React.Component {
   }
 }
 
-export default Login;
+const mapDispatchToProps = () => {
+  return { set };
+};
+
+export default connect(mapDispatchToProps)(Login);

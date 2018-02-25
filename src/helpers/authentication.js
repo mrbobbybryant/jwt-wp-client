@@ -8,7 +8,6 @@ export const isAuthenticated = token => {
       throw new Error('expiredToken');
     }
   } catch (err) {
-    console.log('poop');
     return false;
   }
   return true;
